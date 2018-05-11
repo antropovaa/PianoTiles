@@ -1,7 +1,9 @@
 package sample;
 
+import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 
 import javax.sound.midi.MidiChannel;
@@ -11,7 +13,9 @@ import javax.sound.midi.Synthesizer;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 class Piano {
     private List<ImageView> keys = new ArrayList<>();
@@ -123,7 +127,7 @@ class Piano {
         return pane;
     }
 
-    void setKey(ImageView key, int num, int x, int y) {
+    private void setKey(ImageView key, int num, int x, int y) {
         keys.add(num, key);
         keys.get(num).setLayoutX(x);
         keys.get(num).setLayoutY(y);
@@ -140,6 +144,37 @@ class Piano {
 
     void changeProgram(int n) {
         channels[0].programChange(n);
+    }
+
+    void keyEvent(Scene mainScene) {
+        Map<KeyCode, Integer> keyboard = new HashMap<>();
+        keyboard.put(KeyCode.D, 0);
+        keyboard.put(KeyCode.R, 1);
+        keyboard.put(KeyCode.F, 2);
+        keyboard.put(KeyCode.T, 3);
+        keyboard.put(KeyCode.G, 4);
+        keyboard.put(KeyCode.H, 5);
+        keyboard.put(KeyCode.U, 6);
+        keyboard.put(KeyCode.J, 7);
+        keyboard.put(KeyCode.I, 8);
+        keyboard.put(KeyCode.K, 9);
+        keyboard.put(KeyCode.O, 10);
+        keyboard.put(KeyCode.L, 11);
+
+        mainScene.setOnKeyPressed(e -> {
+            if (keyboard.containsKey(e.getCode())) {
+                int num = keyboard.get(e.getCode());
+                changeKeyImage(num);
+                playSound(octave, num, volume);
+            }
+        });
+
+        mainScene.setOnKeyReleased(e -> {
+            if (keyboard.containsKey(e.getCode())) {
+                int num = keyboard.get(e.getCode());
+                returnKeyImage(num);
+            }
+        });
     }
 
 }

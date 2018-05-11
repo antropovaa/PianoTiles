@@ -126,5 +126,6 @@ class Appearance {
         pane1.getChildren().addAll(piano.getKeyPane(), menuButton, muteButton, octavesPane);
 
         mainScene = new Scene(pane1, 800, 500);
+        piano.keyEvent(mainScene);
     }
 }
