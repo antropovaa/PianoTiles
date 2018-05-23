@@ -53,7 +53,6 @@ class Key {
         return isPressed;
     }
 
-
     void changeStatus(boolean status) {
         isPressed = status;
     }

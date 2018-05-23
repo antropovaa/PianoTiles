@@ -86,30 +86,30 @@ class Piano {
             });
         }
 
-            scene.setOnKeyPressed(e -> {
-                int code = keyboard.get(e.getCode());
+        scene.setOnKeyPressed(e -> {
+            int code = keyboard.get(e.getCode());
+            if (keyboard.containsKey(e.getCode()) && !keys.get(code).getStatus()) {
                 Key thisKey = keys.get(code);
-                if (keyboard.containsKey(e.getCode()) && !thisKey.getStatus()) {
-                    thisKey.changeStatus(true);
-                    thisKey.changeImage();
-                    Note note = new Note(octave, code, volume);
-                    playSound(note, 0);
+                thisKey.changeStatus(true);
+                thisKey.changeImage();
+                Note note = new Note(octave, code, volume);
+                playSound(note, 0);
 
-                    if (isRecording) {
-                        notes.add(notes.size(), note);
-                        dates.add(dates.size(), new Date());
-                    }
+                if (isRecording) {
+                    notes.add(notes.size(), note);
+                    dates.add(dates.size(), new Date());
                 }
-            });
+            }
+        });
 
-            scene.setOnKeyReleased(e -> {
-                int code = keyboard.get(e.getCode());
-                Key thisKey = keys.get(code);
-                if (keyboard.containsKey(e.getCode())) {
-                    thisKey.changeStatus(false);
-                    thisKey.changeImage();
-                }
-            });
+        scene.setOnKeyReleased(e -> {
+            int code = keyboard.get(e.getCode());
+            Key thisKey = keys.get(code);
+            if (keyboard.containsKey(e.getCode())) {
+                thisKey.changeStatus(false);
+                thisKey.changeImage();
+            }
+        });
     }
 
     Pane getKeyPane() {
