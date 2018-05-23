@@ -19,10 +19,9 @@ import java.io.FileNotFoundException;
 
 class Appearance {
     private Scene menuScene, mainScene, choiceScene;
-    private Piano piano = new Piano();
     private Stage primaryStage;
-//    private File font = new File("/Users/annaantropova/IdeaProjects/PianoTiles/Arial Rounded Bold.ttf");
     private File font = new File("src/resources/Arial Rounded Bold.ttf");
+    private Piano piano = new Piano(85, 150);
 
     Appearance(Stage primaryStage) throws MidiUnavailableException, FileNotFoundException {
         this.primaryStage = primaryStage;
@@ -114,11 +113,11 @@ class Appearance {
         muteButton.setLayoutY(0);
         muteButton.setOnAction(e -> {
             if (muteButton.isSelected()) {
-                piano.synth.close();
+                piano.synthesizer.close();
                 piano.volume = 0;
             } else {
                 try {
-                    piano.synth.open();
+                    piano.synthesizer.open();
                 } catch (MidiUnavailableException e1) {
                     e1.printStackTrace();
                 }
@@ -161,9 +160,7 @@ class Appearance {
         recordButton.setLayoutX(450);
 
         Button clearButton = new Button("Clear history");
-        clearButton.setOnAction(e -> {
-            piano.clear();
-        });
+        clearButton.setOnAction(e -> piano.clear());
         clearButton.setLayoutY(0);
         clearButton.setLayoutX(650);
 
