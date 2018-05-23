@@ -3,47 +3,66 @@ package sample;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import javax.sound.midi.MidiUnavailableException;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 class Appearance {
     private Scene menuScene, mainScene, choiceScene;
     private Piano piano = new Piano();
     private Stage primaryStage;
+//    private File font = new File("/Users/annaantropova/IdeaProjects/PianoTiles/Arial Rounded Bold.ttf");
+    private File font = new File("src/resources/Arial Rounded Bold.ttf");
 
     Appearance(Stage primaryStage) throws MidiUnavailableException, FileNotFoundException {
         this.primaryStage = primaryStage;
     }
 
-    void setMenuScene() {
-        Button startButton = new Button("Play");
-        startButton.setOnAction(e -> primaryStage.setScene(choiceScene));
-        Button exitButton = new Button("Exit");
-        exitButton.setOnAction(e -> primaryStage.close());
-        Label welcomeLabel = new Label("Piano Tiles");
+    void setMenuScene() throws FileNotFoundException {
+        Text welcome1 = new Text(220, 96, "PIANO TILES");
+        welcome1.setFont(Font.loadFont(new FileInputStream(font), 57.45));
+        Text welcome2 = new Text(222, 98, "PIANO TILES");
+        welcome2.setFont(Font.loadFont(new FileInputStream(font), 57.45));
+        welcome1.setFill(Color.WHITE);
 
-        GridPane menu = new GridPane();
-        menu.setAlignment(Pos.CENTER);
-        menu.setVgap(5);
-        menu.add(welcomeLabel, 1, 0);
-        menu.add(startButton, 1, 1);
-        menu.add(exitButton, 1, 2);
+        Text start = new Text(358, 231,"PLAY");
+        start.setFont(Font.loadFont(new FileInputStream(font), 36));
+        start.setOnMouseEntered(e -> start.setFill(Color.WHITE));
+        start.setOnMouseExited(e -> start.setFill(Color.BLACK));
+        start.setOnMouseClicked(e -> primaryStage.setScene(choiceScene));
 
+        Text settings = new Text(311, 283,"SETTINGS");
+        settings.setFont(Font.loadFont(new FileInputStream(font), 36));
+        settings.setOnMouseEntered(e -> settings.setFill(Color.WHITE));
+        settings.setOnMouseExited(e -> settings.setFill(Color.BLACK));
+        //settings.setOnMouseClicked(e -> primaryStage.setScene(settingScene));
+
+        Text exit = new Text(363, 335, "EXIT");
+        exit.setFont(Font.loadFont(new FileInputStream(font), 36));
+        exit.setOnMouseEntered(e -> exit.setFill(Color.WHITE));
+        exit.setOnMouseExited(e -> exit.setFill(Color.BLACK));
+        exit.setOnMouseClicked(e -> primaryStage.close());
+
+        Pane menu = new Pane();
         menu.setStyle("-fx-background-color: #959181");
+        menu.getChildren().addAll(welcome1, welcome2, start, settings, exit);
         menuScene = new Scene(menu, 800, 500);
     }
 
-    void setChoiceScene() throws MidiUnavailableException {
-        Label choiceLabel = new Label("Choose the type of piano:");
+    void setChoiceScene() throws MidiUnavailableException, FileNotFoundException {
+        Text choiceText = new Text(182, 190,"Choose the type of piano:");
+        choiceText.setFont(Font.loadFont(new FileInputStream(font), 36));
+
         ObservableList<String> programs = FXCollections.observableArrayList(
                 "Acoustic piano",
                 "Bright piano",
@@ -55,34 +74,40 @@ class Appearance {
                 "Clavinet"
         );
 
-        ChoiceBox choiceBox = new ChoiceBox();
-        choiceBox.setItems(programs);
+        ChoiceBox choiceBox = new ChoiceBox(programs);
+        choiceBox.setValue("Acoustic piano");
         choiceBox.getSelectionModel().selectedItemProperty().addListener((ChangeListener<String>) (ov, old_val, new_val) -> {
             for (int i = 0; i < programs.size(); i++)
                 if (new_val.equals(programs.get(i)))
-                    piano.changeProgram(i + 1);
+                    piano.changeProgram(0,i + 1);
         });
+        choiceBox.setLayoutX(327);
+        choiceBox.setLayoutY(220);
 
-        Button menuButton1 = new Button("Back to menu");
-        menuButton1.setOnAction(e -> primaryStage.setScene(menuScene));
+        Text back = new Text(10, 30,"< BACK");
+        back.setFont(Font.loadFont(new FileInputStream(font), 24));
+        back.setOnMouseEntered(e -> back.setFill(Color.WHITE));
+        back.setOnMouseExited(e -> back.setFill(Color.BLACK));
+        back.setOnMouseClicked(e -> primaryStage.setScene(menuScene));
 
-        Button playButton = new Button("Play");
-        playButton.setOnAction(e -> primaryStage.setScene(mainScene));
+        Text play = new Text(316, 300,"LET'S PLAY");
+        play.setFont(Font.loadFont(new FileInputStream(font), 30));
+        play.setOnMouseEntered(e -> play.setFill(Color.WHITE));
+        play.setOnMouseExited(e -> play.setFill(Color.BLACK));
+        play.setOnMouseClicked(e -> primaryStage.setScene(mainScene));
 
-        VBox choice = new VBox();
-        choice.setAlignment(Pos.CENTER);
-        choice.setSpacing(5);
+        Pane choice = new Pane();
         choice.setStyle("-fx-background-color: #959181");
-        choice.getChildren().addAll(menuButton1, choiceLabel, choiceBox, playButton);
+        choice.getChildren().addAll(back, choiceText, choiceBox, play);
 
         choiceScene = new Scene(choice, 800, 500);
         primaryStage.setScene(menuScene);
-        primaryStage.setTitle("Piano Tiles");
     }
 
     void setMainScene() throws FileNotFoundException, MidiUnavailableException {
         Pane pane1 = new Pane();
         pane1.setStyle("-fx-background-color: #959181");
+
         ToggleButton muteButton = new ToggleButton("Mute");
         muteButton.setSelected(false);
         muteButton.setLayoutX(350);
@@ -117,15 +142,39 @@ class Appearance {
             });
             octavesPane.getChildren().add(octaves[i]);
         }
-        octavesPane.setLayoutY(460);
+        octavesPane.setLayoutY(100);
         octavesPane.setLayoutX(120);
 
         Button menuButton = new Button("Menu");
         menuButton.setOnAction(e -> primaryStage.setScene(menuScene));
 
-        pane1.getChildren().addAll(piano.getKeyPane(), menuButton, muteButton, octavesPane);
+        ToggleButton recordButton = new ToggleButton("Record");
+        recordButton.setSelected(false);
+        recordButton.setOnAction(e -> {
+            if (recordButton.isSelected())
+                piano.setStatus(true);
+            else {
+                piano.setStatus(false);
+            }
+        });
+        recordButton.setLayoutY(0);
+        recordButton.setLayoutX(450);
+
+        Button clearButton = new Button("Clear history");
+        clearButton.setOnAction(e -> {
+            piano.clear();
+        });
+        clearButton.setLayoutY(0);
+        clearButton.setLayoutX(650);
+
+        Button playSongButton = new Button("Play song");
+        playSongButton.setOnAction(e -> piano.playSong());
+        playSongButton.setLayoutX(550);
+        playSongButton.setLayoutY(0);
+
+        pane1.getChildren().addAll(piano.getKeyPane(), menuButton, muteButton, octavesPane, recordButton, clearButton, playSongButton);
 
         mainScene = new Scene(pane1, 800, 500);
-        piano.keyEvent(mainScene);
+        piano.addKeyEvent(mainScene);
     }
 }

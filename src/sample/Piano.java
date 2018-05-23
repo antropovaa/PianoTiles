@@ -12,12 +12,9 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Synthesizer;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-class Piano {
+public class Piano {
     private List<ImageView> keys = new ArrayList<>();
     private List<Image> keysUnchecked = new ArrayList<>();
     private List<Image> keysClicked = new ArrayList<>();
@@ -25,9 +22,12 @@ class Piano {
     private int octave = 4;
     private MidiChannel[] channels = null;
     Synthesizer synth;
+    private List<Note> notes = new ArrayList<>();
+    private List<Date> dates = new ArrayList<>();
+    private boolean recordingStatus = false;
 
-    Piano() throws FileNotFoundException, MidiUnavailableException {
-        String path = "/Users/annaantropova/IdeaProjects/PianoTiles/src/images/";
+    public Piano() throws FileNotFoundException, MidiUnavailableException {
+        String path = "src/resources/";
         List<FileInputStream> inputsClicked = new ArrayList<>();
         List<FileInputStream> inputs = new ArrayList<>();
 
@@ -97,12 +97,65 @@ class Piano {
         synth.open();
         channels = synth.getChannels();
 
-        // making keys play sounds
+        // making keys play sounds by mouse events
+        addMouseEvent();
+    }
+
+    void addKeyEvent(Scene mainScene) {
+        boolean[] isKeyPressed = new boolean[12];
+        for (int i = 1; i < 12; i++)
+            isKeyPressed[i] = false;
+
+        Map<KeyCode, Integer> keyboard = new HashMap<>();
+        keyboard.put(KeyCode.D, 0);
+        keyboard.put(KeyCode.R, 1);
+        keyboard.put(KeyCode.F, 2);
+        keyboard.put(KeyCode.T, 3);
+        keyboard.put(KeyCode.G, 4);
+        keyboard.put(KeyCode.H, 5);
+        keyboard.put(KeyCode.U, 6);
+        keyboard.put(KeyCode.J, 7);
+        keyboard.put(KeyCode.I, 8);
+        keyboard.put(KeyCode.K, 9);
+        keyboard.put(KeyCode.O, 10);
+        keyboard.put(KeyCode.L, 11);
+
+        mainScene.setOnKeyPressed(e -> {
+            int num = keyboard.get(e.getCode());
+            if (keyboard.containsKey(e.getCode()) && !isKeyPressed[num]) {
+                changeKeyImage(num);
+                Note note = new Note(octave, num, volume);
+                playSound(note, 0);
+
+                if (isRecording()) {
+                    //recorder.addNote(note);
+                    notes.add(notes.size(), note);
+                    dates.add(dates.size(), new Date());
+                    isKeyPressed[num] = true;
+                }
+            }
+        });
+
+        mainScene.setOnKeyReleased(e -> {
+            int num = keyboard.get(e.getCode());
+            if (keyboard.containsKey(e.getCode())) {
+                isKeyPressed[num] = false;
+                returnKeyImage(num);
+            }
+        });
+    }
+
+    void addMouseEvent() {
         for (int i = 0; i < 12; i++) {
             int num = i;
             getKey(num).setOnMousePressed(e -> {
                 changeKeyImage(num);
-                playSound(octave, num, volume);
+                Note note = new Note(octave, num, volume);
+                playSound(note, 0);
+                if (isRecording()) {
+                    notes.add(notes.size(), note);
+                    dates.add(dates.size(), new Date());
+                }
             });
             getKey(num).setOnMouseReleased(e -> returnKeyImage(num));
         }
@@ -133,48 +186,58 @@ class Piano {
         keys.get(num).setLayoutY(y);
     }
 
-    private void playSound(int octave, int key, int volume) {
-        int firstNote = 12 * (octave + 1);
-        channels[0].noteOn(key + firstNote, volume);
+    public void playSound(Note note, int channel) {
+        int firstNote = 12 * (note.getOctave() + 1);
+        channels[channel].noteOn(note.getNum() + firstNote, note.getVolume());
     }
 
     void setOctave(int oct) {
         octave = oct;
     }
 
-    void changeProgram(int n) {
-        channels[0].programChange(n);
+    void changeProgram(int ch, int num) {
+        channels[ch].programChange(num);
     }
 
-    void keyEvent(Scene mainScene) {
-        Map<KeyCode, Integer> keyboard = new HashMap<>();
-        keyboard.put(KeyCode.D, 0);
-        keyboard.put(KeyCode.R, 1);
-        keyboard.put(KeyCode.F, 2);
-        keyboard.put(KeyCode.T, 3);
-        keyboard.put(KeyCode.G, 4);
-        keyboard.put(KeyCode.H, 5);
-        keyboard.put(KeyCode.U, 6);
-        keyboard.put(KeyCode.J, 7);
-        keyboard.put(KeyCode.I, 8);
-        keyboard.put(KeyCode.K, 9);
-        keyboard.put(KeyCode.O, 10);
-        keyboard.put(KeyCode.L, 11);
+    class JThread extends Thread {
+        List<Note> notes;
 
-        mainScene.setOnKeyPressed(e -> {
-            if (keyboard.containsKey(e.getCode())) {
-                int num = keyboard.get(e.getCode());
-                changeKeyImage(num);
-                playSound(octave, num, volume);
-            }
-        });
+        JThread(List<Note> notes) {
+            this.notes = notes;
+        }
 
-        mainScene.setOnKeyReleased(e -> {
-            if (keyboard.containsKey(e.getCode())) {
-                int num = keyboard.get(e.getCode());
-                returnKeyImage(num);
+        public void run() {
+            changeProgram(1, channels[0].getProgram());
+            if (notes.size() != 0) {
+                for (int i = 0; i < notes.size() - 1; i++) {
+                    playSound(notes.get(i), 1);
+                    long time = dates.get(i + 1).getTime() - dates.get(i).getTime();
+                    try {
+                        Thread.sleep(time);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                playSound(notes.get(notes.size() - 1), 1);
             }
-        });
+        }
+    }
+
+    void playSong() {
+        JThread thread = new JThread(notes);
+        thread.start();
+    }
+
+    void clear() {
+        notes.clear();
+    }
+
+    private boolean isRecording() {
+        return this.recordingStatus;
+    }
+
+    void setStatus(boolean status) {
+        this.recordingStatus = status;
     }
 
 }

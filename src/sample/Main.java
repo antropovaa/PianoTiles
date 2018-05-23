@@ -11,6 +11,7 @@ public class Main extends Application {
         appearance.setMenuScene();
         appearance.setChoiceScene();
         appearance.setMainScene();
+        primaryStage.setTitle("PIANO TILES");
         primaryStage.show();
     }
 
