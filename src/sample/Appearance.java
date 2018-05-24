@@ -38,6 +38,10 @@ class Appearance {
         welcome2.setFill(gray);
         welcome1.setFill(Color.WHITE);
 
+        Text version = new Text(688, 98, "v.1.0");
+        version.setFont(Font.loadFont(new FileInputStream(font), 18));
+        version.setFill(light);
+
         Text start = new Text(452, 231, "PLAY");
         start.setFill(gray);
         start.setFont(Font.loadFont(new FileInputStream(font), 36));
@@ -62,7 +66,7 @@ class Appearance {
 
         Pane menu = new Pane();
         menu.setStyle("-fx-background-color: #959181");
-        menu.getChildren().addAll(welcome1, welcome2, start, settings, exit);
+        menu.getChildren().addAll(welcome1, welcome2, version, start, settings, exit);
         menuScene = new Scene(menu, 1000, 500);
     }
 
