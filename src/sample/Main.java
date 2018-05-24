@@ -9,7 +9,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         Appearance appearance = new Appearance(primaryStage);
         appearance.setMenuScene();
-        appearance.setChoiceScene();
+        appearance.setSettingsScene();
         appearance.setMainScene();
         primaryStage.setTitle("PIANO TILES");
         primaryStage.show();

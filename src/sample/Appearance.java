@@ -5,7 +5,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -18,48 +19,56 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 class Appearance {
-    private Scene menuScene, mainScene, choiceScene;
+    private Scene menuScene, mainScene, settingsScene;
     private Stage primaryStage;
     private File font = new File("src/resources/Arial Rounded Bold.ttf");
-    private Piano piano = new Piano(85, 150);
+    private Color gray = Color.rgb(23, 23, 23);
+    private Color light = Color.rgb(196, 196, 179);
+    private Piano piano1 = new Piano(11, 140);
 
     Appearance(Stage primaryStage) throws MidiUnavailableException, FileNotFoundException {
         this.primaryStage = primaryStage;
     }
 
     void setMenuScene() throws FileNotFoundException {
-        Text welcome1 = new Text(220, 96, "PIANO TILES");
+        Text welcome1 = new Text(318, 96, "PIANO TILES");
         welcome1.setFont(Font.loadFont(new FileInputStream(font), 57.45));
-        Text welcome2 = new Text(222, 98, "PIANO TILES");
+        Text welcome2 = new Text(316, 98, "PIANO TILES");
         welcome2.setFont(Font.loadFont(new FileInputStream(font), 57.45));
+        welcome2.setFill(gray);
         welcome1.setFill(Color.WHITE);
 
-        Text start = new Text(358, 231,"PLAY");
+        Text start = new Text(452, 231, "PLAY");
+        start.setFill(gray);
         start.setFont(Font.loadFont(new FileInputStream(font), 36));
+
         start.setOnMouseEntered(e -> start.setFill(Color.WHITE));
-        start.setOnMouseExited(e -> start.setFill(Color.BLACK));
-        start.setOnMouseClicked(e -> primaryStage.setScene(choiceScene));
+        start.setOnMouseExited(e -> start.setFill(gray));
+        start.setOnMouseClicked(e -> primaryStage.setScene(mainScene));
 
-        Text settings = new Text(311, 283,"SETTINGS");
+        Text settings = new Text(407, 283, "SETTINGS");
         settings.setFont(Font.loadFont(new FileInputStream(font), 36));
+        settings.setFill(gray);
         settings.setOnMouseEntered(e -> settings.setFill(Color.WHITE));
-        settings.setOnMouseExited(e -> settings.setFill(Color.BLACK));
-        //settings.setOnMouseClicked(e -> primaryStage.setScene(settingScene));
+        settings.setOnMouseExited(e -> settings.setFill(gray));
+        settings.setOnMouseClicked(e -> primaryStage.setScene(settingsScene));
 
-        Text exit = new Text(363, 335, "EXIT");
+        Text exit = new Text(458, 335, "EXIT");
         exit.setFont(Font.loadFont(new FileInputStream(font), 36));
+        exit.setFill(gray);
         exit.setOnMouseEntered(e -> exit.setFill(Color.WHITE));
-        exit.setOnMouseExited(e -> exit.setFill(Color.BLACK));
+        exit.setOnMouseExited(e -> exit.setFill(gray));
         exit.setOnMouseClicked(e -> primaryStage.close());
 
         Pane menu = new Pane();
         menu.setStyle("-fx-background-color: #959181");
         menu.getChildren().addAll(welcome1, welcome2, start, settings, exit);
-        menuScene = new Scene(menu, 800, 500);
+        menuScene = new Scene(menu, 1000, 500);
     }
 
-    void setChoiceScene() throws MidiUnavailableException, FileNotFoundException {
-        Text choiceText = new Text(182, 190,"Choose the type of piano:");
+    void setSettingsScene() throws MidiUnavailableException, FileNotFoundException {
+        Text choiceText = new Text(356, 190, "TYPE OF PIANO:");
+        choiceText.setFill(gray);
         choiceText.setFont(Font.loadFont(new FileInputStream(font), 36));
 
         ObservableList<String> programs = FXCollections.observableArrayList(
@@ -77,29 +86,32 @@ class Appearance {
         choiceBox.setValue("Acoustic piano");
         choiceBox.getSelectionModel().selectedItemProperty().addListener((ChangeListener<String>) (ov, old_val, new_val) -> {
             for (int i = 0; i < programs.size(); i++)
-                if (new_val.equals(programs.get(i)))
-                    piano.changeProgram(0,i + 1);
+                if (new_val.equals(programs.get(i))) {
+                    piano1.changeProgram(0, i + 1);
+                }
         });
-        choiceBox.setLayoutX(327);
+        choiceBox.setLayoutX(424);
         choiceBox.setLayoutY(220);
 
-        Text back = new Text(10, 30,"< BACK");
-        back.setFont(Font.loadFont(new FileInputStream(font), 24));
-        back.setOnMouseEntered(e -> back.setFill(Color.WHITE));
-        back.setOnMouseExited(e -> back.setFill(Color.BLACK));
-        back.setOnMouseClicked(e -> primaryStage.setScene(menuScene));
+        Text menu = new Text(10, 30, "MENU");
+        menu.setFont(Font.loadFont(new FileInputStream(font), 24));
+        menu.setFill(gray);
+        menu.setOnMouseEntered(e -> menu.setFill(Color.WHITE));
+        menu.setOnMouseExited(e -> menu.setFill(gray));
+        menu.setOnMouseClicked(e -> primaryStage.setScene(menuScene));
 
-        Text play = new Text(316, 300,"LET'S PLAY");
-        play.setFont(Font.loadFont(new FileInputStream(font), 30));
+        Text play = new Text(930, 30, "PLAY");
+        play.setFont(Font.loadFont(new FileInputStream(font), 24));
+        play.setFill(gray);
         play.setOnMouseEntered(e -> play.setFill(Color.WHITE));
-        play.setOnMouseExited(e -> play.setFill(Color.BLACK));
+        play.setOnMouseExited(e -> play.setFill(gray));
         play.setOnMouseClicked(e -> primaryStage.setScene(mainScene));
 
         Pane choice = new Pane();
         choice.setStyle("-fx-background-color: #959181");
-        choice.getChildren().addAll(back, choiceText, choiceBox, play);
+        choice.getChildren().addAll(menu, choiceText, choiceBox, play);
 
-        choiceScene = new Scene(choice, 800, 500);
+        settingsScene = new Scene(choice, 1000, 500);
         primaryStage.setScene(menuScene);
     }
 
@@ -107,71 +119,173 @@ class Appearance {
         Pane pane1 = new Pane();
         pane1.setStyle("-fx-background-color: #959181");
 
-        ToggleButton muteButton = new ToggleButton("Mute");
-        muteButton.setSelected(false);
-        muteButton.setLayoutX(350);
-        muteButton.setLayoutY(0);
-        muteButton.setOnAction(e -> {
-            if (muteButton.isSelected()) {
-                piano.synthesizer.close();
-                piano.volume = 0;
+        Text backButton = new Text(10, 30, "BACK");
+        backButton.setFill(gray);
+        backButton.setFont(Font.loadFont(new FileInputStream(font), 24));
+        backButton.setOnMouseEntered(e -> backButton.setFill(Color.WHITE));
+        backButton.setOnMouseExited(e -> backButton.setFill(gray));
+        backButton.setOnMouseClicked(e -> primaryStage.setScene(menuScene));
+
+        Text currentOctaves = new Text(403, 130, "OCTAVE 4 - 5");
+        currentOctaves.setFill(gray);
+        currentOctaves.setFont(Font.loadFont(new FileInputStream(font), 30));
+
+        ImageView previousOctave = new ImageView(new Image(new FileInputStream("src/resources/previous.png")));
+        ImageView nextOctave = new ImageView(new Image(new FileInputStream("src/resources/next.png")));
+
+        previousOctave.setOnMouseClicked(e -> {
+            int currentOctave = piano1.getOctave();
+            if (currentOctave > 1)
+                piano1.setOctave(currentOctave - 1);
+            try {
+                changeText(currentOctaves, nextOctave, previousOctave);
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            }
+        });
+        previousOctave.setLayoutX(11);
+        previousOctave.setLayoutY(103);
+
+        nextOctave.setOnMouseClicked(e -> {
+            int currentOctave = piano1.getOctave();
+            if (currentOctave < 7)
+                piano1.setOctave(currentOctave + 1);
+            try {
+                changeText(currentOctaves, nextOctave, previousOctave);
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            }
+        });
+        nextOctave.setLayoutX(932);
+        nextOctave.setLayoutY(100);
+
+        ImageView playButton = new ImageView(new Image(new FileInputStream("src/resources/play.png")));
+        playButton.setOnMouseClicked(e -> piano1.playSong());
+        playButton.setLayoutX(425);
+        playButton.setLayoutY(11);
+
+        ImageView recordButton = new ImageView(new Image(new FileInputStream("src/resources/record_inactive.png")));
+        final boolean[] recordButtonStatus = {false};
+        recordButton.setOnMouseClicked(e -> {
+            if (!recordButtonStatus[0]) {
+                try {
+                    recordButton.setImage(new Image(new FileInputStream("src/resources/record_active.png")));
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
+                }
+                recordButtonStatus[0] = true;
+                piano1.setStatus(true);
             } else {
                 try {
-                    piano.synthesizer.open();
+                    recordButton.setImage(new Image(new FileInputStream("src/resources/record_inactive.png")));
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
+                }
+                recordButtonStatus[0] = false;
+                piano1.setStatus(false);
+            }
+        });
+        recordButton.setLayoutX(480);
+        recordButton.setLayoutY(11);
+
+        ImageView restartButton = new ImageView(new Image(new FileInputStream("src/resources/restart.png")));
+        restartButton.setOnMouseClicked(e -> piano1.clear());
+        restartButton.setLayoutX(535);
+        restartButton.setLayoutY(11);
+
+        ImageView settingsButton = new ImageView(new Image(new FileInputStream("src/resources/settings.png")));
+        settingsButton.setOnMouseClicked(e -> primaryStage.setScene(settingsScene));
+        settingsButton.setOnMouseEntered(e -> {
+            try {
+                settingsButton.setImage(
+                        new Image(new FileInputStream("src/resources/settings_active.png"))
+                );
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            }
+        });
+        settingsButton.setOnMouseExited(e -> {
+            try {
+                settingsButton.setImage(
+                        new Image(new FileInputStream("src/resources/settings.png"))
+                );
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            }
+        });
+        settingsButton.setLayoutX(909);
+        settingsButton.setLayoutY(11);
+
+        ImageView muteButton = new ImageView(new Image(new FileInputStream("src/resources/mute_unactive.png")));
+        final boolean[] muteStatus = {false};
+        muteButton.setOnMouseClicked(e -> {
+            if (!muteStatus[0]) {
+                muteStatus[0] = true;
+                try {
+                    muteButton.setImage(new Image(new FileInputStream("src/resources/mute_active.png")));
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
+                }
+                piano1.synthesizer.close();
+                piano1.volume = 0;
+            } else {
+                muteStatus[0] = false;
+                try {
+                    muteButton.setImage(new Image(new FileInputStream("src/resources/mute_unactive.png")));
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
+                }
+                try {
+                    piano1.synthesizer.open();
                 } catch (MidiUnavailableException e1) {
                     e1.printStackTrace();
                 }
-                piano.volume = 100;
+                piano1.volume = 100;
             }
         });
+        muteButton.setLayoutX(956);
+        muteButton.setLayoutY(11);
 
-        ToggleButton[] octaves = new ToggleButton[7];
-        ToggleGroup octavesButtons = new ToggleGroup();
-        HBox octavesPane = new HBox();
-        octavesPane.setSpacing(5);
+        Text quote = new Text(104, 476, "“When you play, never mind who listens to you.” – Robert Schumann");
+        quote.setFill(light);
+        quote.setFont(Font.loadFont(new FileInputStream(font), 24));
 
-        for (int i = 0; i < 7; i++) {
-            int num = i + 1;
-            octaves[i] = new ToggleButton("Octave " + num);
-            octaves[i].setSelected(false);
-            octaves[i].setToggleGroup(octavesButtons);
-            octaves[i].setOnAction(e -> {
-                if (octaves[num - 1].isSelected())
-                    piano.setOctave(num);
-            });
-            octavesPane.getChildren().add(octaves[i]);
+        pane1.getChildren().addAll(
+                piano1.getKeyPane(), backButton, muteButton, previousOctave, nextOctave,
+                currentOctaves, recordButton, restartButton, playButton, settingsButton, quote
+        );
+
+        mainScene = new Scene(pane1, 1000, 500);
+        piano1.addKeyEvent(mainScene);
+    }
+
+    private void changeText(Text currentOctaves, ImageView next, ImageView previous) throws FileNotFoundException {
+        switch (piano1.getOctave()) {
+            case 1:
+                previous.setImage(new Image(new FileInputStream("src/resources/clear.png")));
+                currentOctaves.setText("OCTAVE 1 - 2");
+                break;
+            case 2:
+                previous.setImage(new Image(new FileInputStream("src/resources/previous.png")));
+                currentOctaves.setText("OCTAVE 2 - 3");
+                break;
+            case 3:
+                currentOctaves.setText("OCTAVE 3 - 4");
+                break;
+            case 4:
+                currentOctaves.setText("OCTAVE 4 - 5");
+                break;
+            case 5:
+                currentOctaves.setText("OCTAVE 5 - 6");
+                break;
+            case 6:
+                next.setImage(new Image(new FileInputStream("src/resources/next.png")));
+                currentOctaves.setText("OCTAVE 6 - 7");
+                break;
+            case 7:
+                next.setImage(new Image(new FileInputStream("src/resources/clear.png")));
+                currentOctaves.setText("OCTAVE 7 - 8");
+                break;
         }
-        octavesPane.setLayoutY(100);
-        octavesPane.setLayoutX(120);
-
-        Button menuButton = new Button("Menu");
-        menuButton.setOnAction(e -> primaryStage.setScene(menuScene));
-
-        ToggleButton recordButton = new ToggleButton("Record");
-        recordButton.setSelected(false);
-        recordButton.setOnAction(e -> {
-            if (recordButton.isSelected())
-                piano.setStatus(true);
-            else {
-                piano.setStatus(false);
-            }
-        });
-        recordButton.setLayoutY(0);
-        recordButton.setLayoutX(450);
-
-        Button clearButton = new Button("Clear history");
-        clearButton.setOnAction(e -> piano.clear());
-        clearButton.setLayoutY(0);
-        clearButton.setLayoutX(650);
-
-        Button playSongButton = new Button("Play song");
-        playSongButton.setOnAction(e -> piano.playSong());
-        playSongButton.setLayoutX(550);
-        playSongButton.setLayoutY(0);
-
-        pane1.getChildren().addAll(piano.getKeyPane(), menuButton, muteButton, octavesPane, recordButton, clearButton, playSongButton);
-
-        mainScene = new Scene(pane1, 800, 500);
-        piano.addKeyEvent(mainScene);
     }
 }

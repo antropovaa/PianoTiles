@@ -25,25 +25,19 @@ class Piano {
     private boolean isRecording = false;
 
     Piano(int locationX, int locationY) throws FileNotFoundException, MidiUnavailableException {
-        for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < 24; i++) {
             Key key = new Key(i);
             keys.add(i, key);
 
-            switch (i) {
-                case 0:
-                case 2:
-                case 4:
-                case 5:
-                case 7:
-                case 9:
-                case 11:
+            switch (key.getType()) {
+                case WHITE:
                     key.setKey(locationX, locationY);
-                    locationX += 90;
+                    locationX += 70;
                     break;
-                default:
-                    locationX -= 30;
+                case BLACK:
+                    locationX -= 25;
                     key.setKey(locationX, locationY);
-                    locationX += 30;
+                    locationX += 25;
                     break;
             }
         }
@@ -54,20 +48,32 @@ class Piano {
     }
 
     void addKeyEvent(Scene scene) {
-        keyboard.put(KeyCode.D, 0);
-        keyboard.put(KeyCode.R, 1);
-        keyboard.put(KeyCode.F, 2);
-        keyboard.put(KeyCode.T, 3);
-        keyboard.put(KeyCode.G, 4);
-        keyboard.put(KeyCode.H, 5);
-        keyboard.put(KeyCode.U, 6);
-        keyboard.put(KeyCode.J, 7);
-        keyboard.put(KeyCode.I, 8);
-        keyboard.put(KeyCode.K, 9);
-        keyboard.put(KeyCode.O, 10);
-        keyboard.put(KeyCode.L, 11);
+        keyboard.put(KeyCode.Z, 0);
+        keyboard.put(KeyCode.W, 1);
+        keyboard.put(KeyCode.S, 2);
+        keyboard.put(KeyCode.E, 3);
+        keyboard.put(KeyCode.X, 4);
+        keyboard.put(KeyCode.C, 5);
+        keyboard.put(KeyCode.R, 6);
+        keyboard.put(KeyCode.F, 7);
+        keyboard.put(KeyCode.T, 8);
+        keyboard.put(KeyCode.V, 9);
+        keyboard.put(KeyCode.Y, 10);
+        keyboard.put(KeyCode.B, 11);
+        keyboard.put(KeyCode.H, 12);
+        keyboard.put(KeyCode.U, 13);
+        keyboard.put(KeyCode.N, 14);
+        keyboard.put(KeyCode.I, 15);
+        keyboard.put(KeyCode.M, 16);
+        keyboard.put(KeyCode.K, 17);
+        keyboard.put(KeyCode.O, 18);
+        keyboard.put(KeyCode.COMMA, 19);
+        keyboard.put(KeyCode.P, 20);
+        keyboard.put(KeyCode.PERIOD, 21);
+        keyboard.put(KeyCode.OPEN_BRACKET, 22);
+        keyboard.put(KeyCode.SEMICOLON, 23);
 
-        for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < 24; i++) {
             Key key = keys.get(i);
             key.getImageView().setOnMousePressed(e -> {
                 key.changeStatus(true);
@@ -87,8 +93,8 @@ class Piano {
         }
 
         scene.setOnKeyPressed(e -> {
-            int code = keyboard.get(e.getCode());
-            if (keyboard.containsKey(e.getCode()) && !keys.get(code).getStatus()) {
+            if (keyboard.containsKey(e.getCode()) && !keys.get(keyboard.get(e.getCode())).getStatus()) {
+                int code = keyboard.get(e.getCode());
                 Key thisKey = keys.get(code);
                 thisKey.changeStatus(true);
                 thisKey.changeImage();
@@ -103,9 +109,9 @@ class Piano {
         });
 
         scene.setOnKeyReleased(e -> {
-            int code = keyboard.get(e.getCode());
-            Key thisKey = keys.get(code);
             if (keyboard.containsKey(e.getCode())) {
+                int code = keyboard.get(e.getCode());
+                Key thisKey = keys.get(code);
                 thisKey.changeStatus(false);
                 thisKey.changeImage();
             }
@@ -126,6 +132,10 @@ class Piano {
 
     void setOctave(int oct) {
         octave = oct;
+    }
+
+    int getOctave() {
+        return octave;
     }
 
     void changeProgram(int ch, int num) {
